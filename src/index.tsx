@@ -1,4 +1,5 @@
 import React from 'react';
+import useFunction from './useFunction';
 
 export type SelectorFn<Value, Selected> = (value: Value) => Selected;
 
@@ -127,6 +128,8 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
     withProvider,
   };
 }
+
+export { useFunction };
 
 function pick<T extends object, U extends keyof T>(origin: T, keys: U[]): Pick<T, U> {
   const empty = {} as Pick<T, U>;

@@ -1,12 +1,16 @@
 import React from 'react';
-import { createContainer } from 'heo';
+import { createContainer, useFunction } from 'heo';
 
 function useCounter() {
   const [count, setCount] = React.useState(0);
 
+  const increment = useFunction(() => {
+    setCount((n) => n + 1);
+  });
+
   return {
     count,
-    setCount,
+    increment,
   };
 }
 

@@ -3,11 +3,7 @@ import CounterContainer from './CounterContainer';
 import styles from './Counter.module.css';
 
 const Counter = () => {
-  const { count, setCount } = CounterContainer.usePicker(['count', 'setCount']);
-
-  function increment() {
-    setCount((n) => n + 1);
-  }
+  const { count, increment } = CounterContainer.usePicker(['count', 'increment']);
 
   return (
     <div className={styles.counter}>
