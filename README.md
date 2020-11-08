@@ -39,7 +39,7 @@ function useCounter() {
   };
 }
 
-const Counter = createContainer(useCounter);
+const CounterContainer = createContainer(useCounter);
 
 function CounterDisplay() {
   const { count, increment } = CounterContainer.usePicker(['count', 'increment']);
@@ -56,9 +56,9 @@ function CounterDisplay() {
 
 function App() {
   return (
-    <Counter.Provider>
+    <CounterContainer.Provider>
       <CounterDisplay />
-    </Counter.Provider>
+    </CounterContainer.Provider>
   );
 }
 
@@ -116,6 +116,8 @@ function ParentComponent() {
 
 ### `Container.useSelector()`
 
+监听当前容器中选择后的值，若值发生改变，则触发 `rerender`
+
 ```tsx
 function ChildComponent() {
   const value = Container.useSelector((state) => state.value);
@@ -124,6 +126,8 @@ function ChildComponent() {
 ```
 
 ### `Container.usePicker()`
+
+`useSelector` 的语法糖，更常用的写法
 
 ```tsx
 function ChildComponent() {
@@ -143,7 +147,7 @@ _你可能会需要用 `useCallback` 记住一个回调，但由于内部函数�
 `Heo` 的灵感来自于 `unstated-next`，并解决了 `unstated-next` 中导致的 `context` 穿透的性能问题，而无需过量抽象组合优化组件。
 在大型模块/项目中性能极其重要，它能为我们节省大量的调优时间。
 
-### 导出成员持久化
+### 导出成员记忆化
 
 在 `React Hooks` 中，每一次 `setState` 会重新执行一遍当前的 `function`，也就是 `rerender`。在这个特性下，组件的内部 `function` 也会随着 `rerender` 而重新创建，表达式也会重新执行，`useMemo` 、`useCallBack` 也因此而存在。
 
@@ -165,7 +169,7 @@ const Counter = createContainer(useCounter);
 
 ### 使用 memo & useMemo 减少性能损耗
 
-常规组件中，默认情况下父组件的 `rerender` 也会穿透到所有的子组件中，层级多计算量大的情况下则会出现性能问题。虽然 `usePicker` 已经阻止了来自不相关状态变化而导致的 `rerender`，但是穿透渲染的情况依然会导致优化没有效果（木桶原理）。这时需要搭配 `React.memo` 来阻止不必要的渲染，由于 `React.memo` 是 `Shadow Equal`， 传递给子组件的参数中也不能带有可变对象，这时需要 `React.useMemo` 来保持参数不可变。
+常规组件中，默认情况下父组件的 `rerender` 也会穿透到所有的子组件中，层级多计算量大的情况下则会出现性能问题。虽然 `usePicker` 已经阻止了来自不相关状态变化而导致的 `rerender`，但是穿透渲染的情况依然会导致优化没有效果（木桶原理）。这时需要搭配 `React.memo` 来阻止不必要的渲染，由于 `React.memo` 是浅对比， 传递给子组件的参数中也不能带有可变对象，这时需要 `React.useMemo` 来保持参数不可变。
 
 ```tsx
 const CustomComponent = React.memo(() => {
