@@ -92,14 +92,24 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
     return selected;
   }
 
-  function usePicker<S extends keyof Value>(selected: S[]): Pick<Value, S> {
+  function usePicker<Selected extends keyof Value>(selected: Selected[]): Pick<Value, Selected> {
     return useSelector((state) => pick(state as Required<Value>, selected));
   }
 
-  function withProvider<T>(OriginComponent: React.FC<T>): React.FC<T> {
+  function withPicker<T, Selected extends keyof Value>(
+    Child: React.FC<T & Pick<Value, Selected>>,
+    selected: Selected[],
+  ): React.FC<Omit<T, Selected>> {
+    return (props) => {
+      const picked = usePicker(selected);
+      return <Child {...picked} {...(props as T)} />;
+    };
+  }
+
+  function withProvider<T>(Child: React.FC<T>): React.FC<T> {
     return (props) => (
       <Provider>
-        <OriginComponent {...props} />
+        <Child {...props} />
       </Provider>
     );
   }
@@ -122,14 +132,18 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
      */
     usePicker,
     /**
+     * High-level component picker
+     * @param Child
+     * @param selected
+     */
+    withPicker,
+    /**
      * Provider wrapper.
-     * @param OriginComponent
+     * @param Child
      */
     withProvider,
   };
 }
-
-export { useFunction };
 
 function pick<T extends object, U extends keyof T>(origin: T, keys: U[]): Pick<T, U> {
   const empty = {} as Pick<T, U>;
@@ -159,3 +173,5 @@ function isShadowEqual(origin: unknown, next: unknown) {
   }
   return false;
 }
+
+export { useFunction, isShadowEqual };

@@ -136,6 +136,18 @@ function ChildComponent() {
 }
 ```
 
+### `Container.withPicker()`
+
+`usePicker` 的高阶组件形式
+
+```tsx
+function ChildComponent({ value }) {
+  return <span>{value}</span>;
+}
+
+Container.withPicker(ChildComponent, ['value']);
+```
+
 ### `useFunction`
 
 持久化 `function` 的 `Hook`。（来自 `ahooks` 中 `usePersistFn`）
