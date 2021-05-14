@@ -7,6 +7,12 @@ export interface ContainerProviderProps<State = void> {
   initialState?: State;
 }
 
+const isSSR =
+  typeof window === 'undefined' ||
+  /ServerSideRendering/.test(window.navigator && window.navigator.userAgent);
+
+const useIsomorphicLayoutEffect = isSSR ? React.useEffect : React.useLayoutEffect;
+
 /**
  * Create a container with `useHook`
  */
@@ -22,8 +28,7 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
       const listeners = React.useRef<Set<(listener: Value) => void>>(new Set()).current;
 
       if (process.env.NODE_ENV !== 'production') {
-        // prevent warning
-        React.useLayoutEffect(() => {
+        useIsomorphicLayoutEffect(() => {
           listeners.forEach((listener) => {
             listener(value);
           });
@@ -56,7 +61,7 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
       selected: Selected;
     } | null>(null);
 
-    React.useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       ref.current = {
         selector,
         value,
@@ -64,7 +69,7 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
       };
     });
 
-    React.useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       // Trigger update conditions, the same will prevent render
       const callback = (nextValue: Value) => {
         try {
