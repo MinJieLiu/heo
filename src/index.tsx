@@ -1,5 +1,4 @@
 import React from 'react';
-import useFunction from './useFunction';
 
 export type SelectorFn<Value, Selected> = (value: Value) => Selected;
 
@@ -111,9 +110,9 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
     };
   }
 
-  function withProvider<T>(Child: React.FC<T>): React.FC<T> {
+  function withProvider<T>(Child: React.FC<T>, initialState?: State): React.FC<T> {
     return (props) => (
-      <Provider>
+      <Provider initialState={initialState}>
         <Child {...props} />
       </Provider>
     );
@@ -179,4 +178,7 @@ function isShadowEqual(origin: unknown, next: unknown) {
   return false;
 }
 
-export { useFunction, isShadowEqual };
+export { isShadowEqual };
+
+export { default as useFunction } from './useFunction';
+export { default as useMethods } from './useMethods';

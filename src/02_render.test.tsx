@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, cleanup } from '@testing-library/react';
-import { createContainer } from '.';
+import { createContainer, useFunction, useMethods } from '.';
 
 describe('render spec', () => {
   afterEach(cleanup);
@@ -9,11 +9,28 @@ describe('render spec', () => {
     const CounterContainer = createContainer(() => {
       const [count, setCount] = React.useState(0);
       const [total, increment] = React.useReducer((c) => c + 1, 0);
+
+      const [userId, setUserId] = React.useState('jack');
+
+      const setUserTonny = useFunction(() => {
+        setUserId('tonny');
+      });
+
+      const methods = useMethods({
+        setUserMarry() {
+          setUserId('marry');
+        },
+      });
+
       return {
         count,
         setCount,
         total,
         increment,
+
+        userId,
+        setUserTonny,
+        methods,
       };
     });
 
@@ -64,15 +81,40 @@ describe('render spec', () => {
       );
     });
 
+    const Counter4 = React.memo(() => {
+      const { setUserTonny, methods } = CounterContainer.usePicker(['setUserTonny', 'methods']);
+
+      const renderCount = React.useRef(0);
+
+      if (renderCount.current > 0) throw new Error('Inconsistent rendering (4)!');
+
+      renderCount.current += 1;
+
+      return (
+        <>
+          <button type="button" onClick={setUserTonny}>
+            ADD4
+          </button>
+          <button type="button" onClick={methods.setUserMarry}>
+            ADD5
+          </button>
+        </>
+      );
+    });
+
     const App = () => (
       <CounterContainer.Provider>
         <Counter1 />
         <Counter2 />
         <Counter3 />
+        <Counter4 />
       </CounterContainer.Provider>
     );
     const { getAllByText } = render(<App />);
     expect(() => fireEvent.click(getAllByText('ADD1')[0])).not.toThrow();
+    expect(() => fireEvent.click(getAllByText('ADD2')[0])).not.toThrow();
     expect(() => fireEvent.click(getAllByText('ADD3')[0])).not.toThrow();
+    expect(() => fireEvent.click(getAllByText('ADD4')[0])).not.toThrow();
+    expect(() => fireEvent.click(getAllByText('ADD5')[0])).not.toThrow();
   });
 });

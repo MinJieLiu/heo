@@ -1,13 +1,17 @@
 import React from 'react';
 
+/**
+ * Hook of persistent function
+ */
 function useFunction<T extends (...args: any[]) => any>(fn: T) {
-  const ref = React.useRef<Function>(() => {
-    throw new Error('Cannot call function while rendering.');
-  });
+  const { current } = React.useRef({ fn, result: undefined as T | undefined });
+  current.fn = fn;
 
-  ref.current = fn;
+  if (!current.result) {
+    current.result = ((...args) => current.fn.call(null, ...args)) as T;
+  }
 
-  return React.useCallback(ref.current as T, [ref]);
+  return current.result as T;
 }
 
 export default useFunction;
