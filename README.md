@@ -98,11 +98,35 @@ const Container = createContainer(useCustomHook);
 
 ### `<Container.Provider>`
 
+Container.Provider基本用法
+
 ```tsx
 function ParentComponent() {
   return (
     <Container.Provider>
       <ChildComponent />
+    </Container.Provider>
+  );
+}
+```
+
+Container.Provider支持Function的children
+
+```tsx
+function useCustomHook() {
+  const [value, setValue] = useState();
+  return {value}
+}
+
+function ParentComponent() {
+  return (
+    <Container.Provider>
+      {({value})=>{
+        // use value to do something in top component 
+
+        // const computedValue=doSomething(value)
+        return <ChildComponent />
+      }}
     </Container.Provider>
   );
 }
