@@ -115,16 +115,15 @@ Container.Provider支持Function的children
 ```tsx
 function useCustomHook() {
   const [value, setValue] = useState();
-  return {value}
+  return { value };
 }
 
 function ParentComponent() {
   return (
     <Container.Provider>
-      {({value})=>{
-        // use value to do something in top component 
-
-        // const computedValue=doSomething(value)
+      {({ value })=>{
+        // use value to do something in top component.
+        // const computedValue=doSomething(value);
         return <ChildComponent />
       }}
     </Container.Provider>

@@ -38,7 +38,6 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
           listener(value);
         });
       }
-
       const wrapChildren = typeof children === "function" ? children(value) : children;
 
       return (
