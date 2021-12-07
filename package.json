@@ -1,6 +1,6 @@
 {
   "name": "heo",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A simple and easy to use react state management library",
   "author": "MinJieLiu",
   "license": "MIT",
@@ -42,7 +42,6 @@
     "@types/react-dom": "^16.9.9",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
-    "microbundle-crl": "^0.13.11",
     "babel-eslint": "^10.1.0",
     "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
@@ -52,6 +51,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
     "gh-pages": "^3.1.0",
+    "microbundle-crl": "^0.13.11",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "react": "^16.13.1",

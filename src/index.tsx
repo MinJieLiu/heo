@@ -2,7 +2,7 @@ import React from 'react';
 
 export type SelectorFn<Value, Selected> = (value: Value) => Selected;
 
-export interface ContainerProviderProps<State = void,Value=void> {
+export interface ContainerProviderProps<State = void, Value = void> {
   initialState?: State;
   children?: React.ReactNode | ((value: Value) => React.ReactNode);
 }
@@ -22,8 +22,8 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
   const Context = React.createContext<Value | null>(null, () => 0);
   const ListenerContext = React.createContext<Set<(value: Value) => void>>(new Set());
 
-  const Provider: React.FC<ContainerProviderProps<State,Value>> = React.memo(
-    ({ initialState, children }) => {
+  const Provider = React.memo(
+    ({ initialState, children }: ContainerProviderProps<State, Value>) => {
       const value = useHook(initialState);
       const listeners = React.useRef<Set<(listener: Value) => void>>(new Set()).current;
 
@@ -38,11 +38,12 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
           listener(value);
         });
       }
-      const wrapChildren = typeof children === "function" ? children(value) : children;
 
       return (
         <Context.Provider value={value}>
-          <ListenerContext.Provider value={listeners}>{wrapChildren}</ListenerContext.Provider>
+          <ListenerContext.Provider value={listeners}>
+            {typeof children === 'function' ? children(value) : children}
+          </ListenerContext.Provider>
         </Context.Provider>
       );
     },
