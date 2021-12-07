@@ -2,8 +2,9 @@ import React from 'react';
 
 export type SelectorFn<Value, Selected> = (value: Value) => Selected;
 
-export interface ContainerProviderProps<State = void> {
+export interface ContainerProviderProps<State = void,Value=void> {
   initialState?: State;
+  children?: React.ReactNode | ((value: Value) => React.ReactNode);
 }
 
 const isSSR =
@@ -21,7 +22,7 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
   const Context = React.createContext<Value | null>(null, () => 0);
   const ListenerContext = React.createContext<Set<(value: Value) => void>>(new Set());
 
-  const Provider: React.FC<ContainerProviderProps<State>> = React.memo(
+  const Provider: React.FC<ContainerProviderProps<State,Value>> = React.memo(
     ({ initialState, children }) => {
       const value = useHook(initialState);
       const listeners = React.useRef<Set<(listener: Value) => void>>(new Set()).current;
@@ -37,9 +38,11 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
           listener(value);
         });
       }
+      const wrapChildren = typeof children === "function" ? children(value) : children;
+
       return (
         <Context.Provider value={value}>
-          <ListenerContext.Provider value={listeners}>{children}</ListenerContext.Provider>
+          <ListenerContext.Provider value={listeners}>{wrapChildren}</ListenerContext.Provider>
         </Context.Provider>
       );
     },
