@@ -15,7 +15,7 @@
   },
   "settings": {
     "react": {
-      "version": "16"
+      "version": "17"
     }
   },
   "rules": {
@@ -37,6 +37,7 @@
     "no-prototype-builtins": 0,
     "no-use-before-define": 0,
     "operator-linebreak": 0,
+    "max-len": ["error", 120],
     "space-before-function-paren": 0
   }
 }

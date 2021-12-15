@@ -7,9 +7,13 @@ export interface ContainerProviderProps<State = void, Value = void> {
   children?: React.ReactNode | ((value: Value) => React.ReactNode);
 }
 
+interface KeepValue<Value> {
+  value: Value;
+  listeners: Set<(value: Value) => void>;
+}
+
 const isSSR =
-  typeof window === 'undefined' ||
-  /ServerSideRendering/.test(window.navigator && window.navigator.userAgent);
+  typeof window === 'undefined' || /ServerSideRendering/.test(window.navigator && window.navigator.userAgent);
 
 const useIsomorphicLayoutEffect = isSSR ? React.useEffect : React.useLayoutEffect;
 
@@ -18,63 +22,52 @@ const useIsomorphicLayoutEffect = isSSR ? React.useEffect : React.useLayoutEffec
  */
 export function createContainer<Value, State = void>(useHook: (initialState?: State) => Value) {
   // Keep the Context never triggering an update
-  // @ts-ignore
-  const Context = React.createContext<Value | null>(null, () => 0);
-  const ListenerContext = React.createContext<Set<(value: Value) => void>>(new Set());
+  const Context = React.createContext<KeepValue<Value> | null>(null);
 
-  const Provider = React.memo(
-    ({ initialState, children }: ContainerProviderProps<State, Value>) => {
-      const value = useHook(initialState);
-      const listeners = React.useRef<Set<(listener: Value) => void>>(new Set()).current;
+  const Provider = React.memo(({ initialState, children }: ContainerProviderProps<State, Value>) => {
+    const value = useHook(initialState);
+    const keepValue = React.useRef<KeepValue<Value>>({ value, listeners: new Set() }).current;
+    keepValue.value = value;
 
-      if (process.env.NODE_ENV !== 'production') {
-        useIsomorphicLayoutEffect(() => {
-          listeners.forEach((listener) => {
-            listener(value);
-          });
-        });
-      } else {
-        listeners.forEach((listener) => {
+    if (process.env.NODE_ENV !== 'production') {
+      useIsomorphicLayoutEffect(() => {
+        keepValue.listeners.forEach((listener) => {
           listener(value);
         });
-      }
+      });
+    } else {
+      keepValue.listeners.forEach((listener) => {
+        listener(value);
+      });
+    }
 
-      return (
-        <Context.Provider value={value}>
-          <ListenerContext.Provider value={listeners}>
-            {typeof children === 'function' ? children(value) : children}
-          </ListenerContext.Provider>
-        </Context.Provider>
-      );
-    },
-  );
+    return (
+      <Context.Provider value={keepValue}>
+        {typeof children === 'function' ? children(value) : children}
+      </Context.Provider>
+    );
+  });
 
   function useSelector<Selected>(selector: SelectorFn<Value, Selected>): Selected {
     const [, forceUpdate] = React.useReducer((c) => c + 1, 0);
-    const value = React.useContext(Context);
-    const listeners = React.useContext(ListenerContext);
-    if (value === null) {
+    const forwardValue = React.useContext(Context);
+    if (forwardValue === null) {
       throw new Error('The component must be wrapped by <Container.Provider />');
     }
+    const { value, listeners } = forwardValue;
     const selected = selector(value);
-    // Last
-    const ref = React.useRef<{
-      selector: SelectorFn<Value, Selected>;
-      value: Value;
-      selected: Selected;
-    } | null>(null);
 
-    useIsomorphicLayoutEffect(() => {
-      ref.current = {
-        selector,
-        value,
-        selected,
-      };
-    });
+    const storeValue = {
+      selector,
+      value,
+      selected,
+    };
+    const ref = React.useRef(storeValue);
+    ref.current = storeValue;
 
     useIsomorphicLayoutEffect(() => {
       // Trigger update conditions, the same will prevent render
-      const callback = (nextValue: Value) => {
+      function callback(nextValue: Value) {
         try {
           if (!ref.current) {
             return;
@@ -91,7 +84,7 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
           // ignore
         }
         forceUpdate();
-      };
+      }
       listeners.add(callback);
       return () => {
         listeners.delete(callback);
