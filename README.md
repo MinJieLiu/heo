@@ -84,7 +84,7 @@ render(<App />, document.getElementById('root'));
 import { createContainer, useFunction } from 'heo';
 
 function useCustomHook() {
-  const [value, setInput] = useState();
+  const [value, setValue] = useState();
   const onChange = useFunction((e) => setValue(e.currentTarget.value));
   return {
     value,
