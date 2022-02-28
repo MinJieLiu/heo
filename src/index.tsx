@@ -29,17 +29,11 @@ export function createContainer<Value, State = void>(useHook: (initialState?: St
     const keepValue = React.useRef<KeepValue<Value>>({ value, listeners: new Set() }).current;
     keepValue.value = value;
 
-    if (process.env.NODE_ENV !== 'production') {
-      useIsomorphicLayoutEffect(() => {
-        keepValue.listeners.forEach((listener) => {
-          listener(value);
-        });
-      });
-    } else {
+    useIsomorphicLayoutEffect(() => {
       keepValue.listeners.forEach((listener) => {
         listener(value);
       });
-    }
+    });
 
     return (
       <Context.Provider value={keepValue}>
