@@ -7,7 +7,7 @@ export interface ContainerProviderProps<State = void, Value = void> {
   children?: React.ReactNode | ((value: Value) => React.ReactNode);
 }
 
-interface KeepValue<Value> {
+export interface KeepValue<Value> {
   value: Value;
   listeners: Set<(value: Value) => void>;
 }
