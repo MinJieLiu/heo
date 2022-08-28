@@ -1,0 +1,37 @@
+{
+  "name": "heo",
+  "version": "2.0.0",
+  "description": "A simple and easy to use react state management library",
+  "author": "MinJieLiu",
+  "license": "MIT",
+  "repository": "https://github.com/MinJieLiu/heo.git",
+  "module": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "heo",
+    "state management",
+    "react state"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@micro-web/microbundle": "^0.14.3",
+    "@types/use-sync-external-store": "^0.0.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "use-sync-external-store": "^1.2.0"
+  }
+}

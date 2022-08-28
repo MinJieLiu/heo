@@ -1,65 +1,34 @@
 {
-  "name": "heo",
-  "version": "1.5.2",
-  "description": "A simple and easy to use react state management library",
+  "name": "root",
+  "private": true,
   "author": "MinJieLiu",
   "license": "MIT",
-  "repository": "https://github.com/MinJieLiu/heo.git",
-  "main": "dist/index.js",
-  "module": "dist/index.modern.js",
-  "source": "src/index.tsx",
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "build": "microbundle-crl --no-compress --format modern,cjs",
-    "start": "microbundle-crl watch --no-compress --format modern,cjs",
-    "prepare": "run-s build",
-    "test": "run-s test:unit test:lint test:build",
-    "test:build": "run-s build",
-    "test:lint": "eslint --ext .js,.ts,.tsx --ignore-pattern dist .",
-    "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
-    "test:watch": "react-scripts test --env=jsdom",
-    "predeploy": "cd example && yarn install && yarn run build",
-    "deploy": "gh-pages -d example/build"
+    "dev": "pnpm -C ./packages/example dev",
+    "build": "pnpm -C ./packages/heo build",
+    "prepare": "husky install",
+    "lint": "npm run lint:js && npm run lint:prettier",
+    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty packages/ --fix",
+    "lint:prettier": "prettier --check \"**/*\" --end-of-line auto --write",
+    "lint:style": "stylelint --fix \"**/*.less\" --syntax less",
+    "lint-staged": "lint-staged"
   },
-  "keywords": [
-    "react",
-    "hooks",
-    "heo",
-    "state management"
-  ],
-  "peerDependencies": {
-    "react": ">=16.8.0"
+  "lint-staged": {
+    "**/*.less": "stylelint --syntax less",
+    "**/*.{js,jsx,ts,tsx}": "eslint --fix --ext .js,.jsx,.ts,.tsx",
+    "**/*.{js,jsx,tsx,ts,less,md,json}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.11.5",
-    "@testing-library/react": "^11.1.1",
-    "@testing-library/user-event": "^12.2.0",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^14.14.6",
-    "@types/react": "^16.9.56",
-    "@types/react-dom": "^16.9.9",
-    "@typescript-eslint/eslint-plugin": "^4.6.1",
-    "@typescript-eslint/parser": "^4.6.1",
-    "babel-eslint": "^10.1.0",
-    "cross-env": "^7.0.2",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.21.5",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "gh-pages": "^3.1.0",
-    "microbundle-crl": "^0.13.11",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.1.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.4",
-    "typescript": "^4.0.5"
-  },
-  "files": [
-    "dist"
-  ]
+    "@micro-web/standard": "^1.0.1",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^4.8.2"
+  }
 }
