@@ -25,7 +25,7 @@ jobs:
       - name: setup pnpm config
         run: pnpm config set store-dir $PNPM_CACHE_FOLDER
       - run: pnpm i
-      - run: pnpm build --if-present
+      - run: pnpm build
       - run: pnpm test
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@1.1.3
