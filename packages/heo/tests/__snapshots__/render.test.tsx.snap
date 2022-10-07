@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render spec should not render with other 1`] = `
+<div>
+  <div>
+    <span>
+      0
+    </span>
+    <button
+      type="button"
+    >
+      ADD1
+    </button>
+  </div>
+  <div>
+    <span>
+      0
+    </span>
+    <button
+      type="button"
+    >
+      ADD2
+    </button>
+  </div>
+  <button
+    type="button"
+  >
+    ADD3
+  </button>
+  <button
+    type="button"
+  >
+    ADD4
+  </button>
+  <button
+    type="button"
+  >
+    ADD5
+  </button>
+  <div>
+    jack
+  </div>
+</div>
+`;
+
+exports[`render spec should not render with other 2`] = `
+<div>
+  <div>
+    <span>
+      1
+    </span>
+    <button
+      type="button"
+    >
+      ADD1
+    </button>
+  </div>
+  <div>
+    <span>
+      2
+    </span>
+    <button
+      type="button"
+    >
+      ADD2
+    </button>
+  </div>
+  <button
+    type="button"
+  >
+    ADD3
+  </button>
+  <button
+    type="button"
+  >
+    ADD4
+  </button>
+  <button
+    type="button"
+  >
+    ADD5
+  </button>
+  <div>
+    marry
+  </div>
+</div>
+`;

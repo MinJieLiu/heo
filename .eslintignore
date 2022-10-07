@@ -4,3 +4,4 @@ node_modules
 .snapshots/
 *.js
 *.d.ts
+jest.config.ts

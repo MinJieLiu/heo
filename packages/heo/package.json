@@ -7,9 +7,9 @@
   "repository": "https://github.com/MinJieLiu/heo.git",
   "module": "dist/index.js",
   "types": "./dist/index.d.ts",
-  "engines": {
-    "node": ">=14"
-  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build"
@@ -27,9 +27,6 @@
   "devDependencies": {
     "@types/use-sync-external-store": "^0.0.3"
   },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "use-sync-external-store": "^1.2.0"
   }

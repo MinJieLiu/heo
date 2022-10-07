@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, fireEvent, cleanup } from '@testing-library/react';
-import { createContainer } from '.';
+import { createStore } from '../src';
 
 describe('basic spec', () => {
   afterEach(cleanup);
 
   it('counter', () => {
-    const CounterContainer = createContainer(() => {
+    const CounterContainer = createStore(() => {
       const [count, setCount] = React.useState(0);
       const [count2, setCount2] = React.useState(0);
       return {
@@ -18,7 +18,7 @@ describe('basic spec', () => {
     });
 
     const Counter1 = React.memo(() => {
-      const { count, setCount } = CounterContainer.useContainer();
+      const { count, setCount } = CounterContainer.usePicker();
       const increment = () => setCount((s) => s + 1);
       const renderCount = React.useRef(0);
       renderCount.current += 1;
@@ -35,7 +35,7 @@ describe('basic spec', () => {
     });
 
     const Counter2 = React.memo(() => {
-      const { count2, setCount2 } = CounterContainer.useContainer();
+      const { count2, setCount2 } = CounterContainer.usePicker();
       const increment = () => setCount2((s) => s + 1);
       const renderCount = React.useRef(0);
       renderCount.current += 1;

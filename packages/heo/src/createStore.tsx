@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign,react/display-name */
 import React, {
   createContext,
   memo,
@@ -11,7 +12,7 @@ import React, {
 import ReactDOM from 'react-dom';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { shallow } from './shallow';
-import type { KeepValue, SelectorFn, StoreProviderProps } from './types';
+import type { StoreBridge, SelectorFn, StoreProviderProps } from './types';
 
 const batchedUpdates = ReactDOM.unstable_batchedUpdates || ((fn: () => void) => fn());
 
@@ -24,20 +25,19 @@ export function createStore<Value extends object, State = void>(
   useHook: (initialState?: State) => Value,
 ) {
   // Keep the Context never triggering an update
-  const Context = createContext<KeepValue<Value> | null>(null);
+  const Context = createContext<StoreBridge<Value> | null>(null);
 
-  // eslint-disable-next-line react/display-name
   const Provider = memo(({ initialState, children }: StoreProviderProps<State, Value>) => {
     const value = useHook(initialState);
-    const keepValue = useRef<KeepValue<Value>>({ value, listeners: new Set() }).current;
-    keepValue.value = value;
+    const bridge = useRef<StoreBridge<Value>>({ value, listeners: new Set() }).current;
+    bridge.value = value;
 
-    useIsomorphicLayoutEffect(() => {
-      batchedUpdates(() => keepValue.listeners.forEach((listener) => listener(value)));
-    });
+    useIsomorphicLayoutEffect(() =>
+      batchedUpdates(() => bridge.listeners.forEach((listener) => listener(value))),
+    );
 
     return (
-      <Context.Provider value={keepValue}>
+      <Context.Provider value={bridge}>
         {typeof children === 'function' ? children(value) : children}
       </Context.Provider>
     );
@@ -51,11 +51,14 @@ export function createStore<Value extends object, State = void>(
     return value;
   }
 
-  function useStoreUpdate(keepValue: KeepValue<Value>, equalityFn: (nextValue: Value) => boolean) {
+  function useStoreUpdate(bridge: StoreBridge<Value>, equalityFn: (nextValue: Value) => boolean) {
+    const fnRef = useRef(equalityFn);
+    fnRef.current = equalityFn;
+
     const subscribe = useCallback((update: () => void) => {
-      const { listeners } = keepValue;
+      const { listeners } = bridge;
       function listener(nextValue: Value) {
-        if (!equalityFn(nextValue)) {
+        if (!fnRef.current(nextValue)) {
           update();
         }
       }
@@ -63,32 +66,20 @@ export function createStore<Value extends object, State = void>(
       return () => listeners.delete(listener);
     }, []);
 
-    const getSnapshot = useCallback(() => keepValue.value, []);
+    const getSnapshot = useCallback(() => bridge.value, []);
     useSyncExternalStore(subscribe, getSnapshot);
   }
 
   function useSelector<Selected>(selector: SelectorFn<Value, Selected>): Selected {
-    const keepValue = useContextValue();
-    const storeValue = {
-      selector,
-      value: keepValue.value,
-      selected: selector(keepValue.value),
-    };
-    const ref = useRef(storeValue);
-    ref.current = storeValue;
+    const bridge = useContextValue();
+    const selected = selector(bridge.value);
 
-    useStoreUpdate(keepValue, (nextValue) => {
-      const refValue = ref.current;
-      if (refValue.value === nextValue) {
-        return true;
-      }
-      return shallow(refValue.selected, refValue.selector(nextValue));
-    });
-    return storeValue.selected;
+    useStoreUpdate(bridge, (nextValue) => shallow(selected, selector(nextValue)));
+    return selected;
   }
 
   function usePicker(): Value {
-    const keepValue = useContextValue();
+    const bridge = useContextValue();
 
     const proxy = useRef<Value>();
     const canUpdate = useRef(false);
@@ -97,10 +88,9 @@ export function createStore<Value extends object, State = void>(
     useMemo(() => {
       const handler: ProxyHandler<Value> = {
         get(target, key) {
-          if (keepValue.value.hasOwnProperty(key)) {
+          if (bridge.value.hasOwnProperty(key)) {
             canUpdate.current = true;
-            // eslint-disable-next-line no-param-reassign
-            target[key] = keepValue.value[key];
+            target[key] = bridge.value[key];
             return target[key];
           }
           return undefined;
@@ -108,7 +98,6 @@ export function createStore<Value extends object, State = void>(
         set(target, key, val) {
           if (key in target && val !== target[key]) {
             updated.current = true;
-            // eslint-disable-next-line no-param-reassign
             target[key] = val;
           }
           return true;
@@ -118,15 +107,14 @@ export function createStore<Value extends object, State = void>(
       proxy.current = new Proxy({} as Value, handler);
     }, []);
 
-    useStoreUpdate(keepValue, (nextValue) => {
+    useStoreUpdate(bridge, (nextValue) => {
       if (!canUpdate.current) return true;
       // Trigger update
       Object.assign(proxy.current as Value, nextValue);
-      if (updated.current) {
-        updated.current = false;
-        return false;
-      }
-      return true;
+      const result = !updated.current;
+      updated.current = false;
+
+      return result;
     });
     return proxy.current as Value;
   }
