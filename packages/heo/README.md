@@ -3,6 +3,7 @@
 > 简单、优雅的 React hooks 状态管理方案
 
 [![CI](https://img.shields.io/github/workflow/status/MinJieLiu/heo/CI)](https://github.com/MinJieLiu/heo/actions?query=workflow%3ACI)
+[![coveralls](https://img.shields.io/coveralls/MinJieLiu/heo.svg?style=flat-square)](https://coveralls.io/r/MinJieLiu/heo)
 [![npm](https://img.shields.io/npm/v/heo)](https://www.npmjs.com/package/heo)
 [![size](https://img.shields.io/bundlephobia/minzip/heo)](https://bundlephobia.com/result?p=heo)
 
