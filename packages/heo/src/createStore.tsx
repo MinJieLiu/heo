@@ -88,12 +88,9 @@ export function createStore<Value extends object, State = void>(
     useMemo(() => {
       const handler: ProxyHandler<Value> = {
         get(target, key) {
-          if (bridge.value.hasOwnProperty(key)) {
-            canUpdate.current = true;
-            target[key] = bridge.value[key];
-            return target[key];
-          }
-          return undefined;
+          canUpdate.current = true;
+          target[key] = bridge.value[key];
+          return target[key];
         },
         set(target, key, val) {
           if (key in target && val !== target[key]) {
