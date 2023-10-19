@@ -33,8 +33,8 @@ const CounterStore = createStore(() => {
   const [count, setCount] = useState(0);
 
   // 函数需要记忆化后导出
-  const increment = useCallback(() => setCount(count + 1), []);
-  const decrement = useCallback(() => setCount(count - 1), []);
+  const increment = useCallback(() => setCount(prev => prev + 1), []);
+  const decrement = useCallback(() => setCount(prev => prev - 1), []);
 
   return {
     count,
